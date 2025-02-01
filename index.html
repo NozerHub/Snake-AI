@@ -1,0 +1,229 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Quest AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="game.js" type="module"></script>
+  <link rel="preload" href="jungle.mp3" as="audio">
+</head>
+<body>
+  <div id="mainMenu" class="menu-container">
+    <h1 class="title">Snake Quest</h1>
+    <div class="menu-content">
+      <button id="startGameBtn" class="menu-button">Start Game</button>
+      <button id="customizeSnakeBtn" class="menu-button">Customize Snake</button>
+      <button id="storeBtn" class="menu-button">Store</button>
+      <button id="aboutBtn" class="menu-button">About</button>
+    </div>
+  </div>
+
+  <!-- New Customize Snake Modal -->
+  <div id="customizeSnakeModal" class="modal">
+    <div class="modal-content snake-customization">
+      <button class="modal-close top-right">×</button>
+      <h2>Snake Customization</h2>
+      <div class="customization-section">
+        <h3>Snake Color</h3>
+        <div class="color-palette">
+          <div class="color-option" data-color="#2d5a27">Forest Green</div>
+          <div class="color-option" data-color="#4a8044">Olive Green</div>
+          <div class="color-option" data-color="#228b22">Lime Green</div>
+          <div class="color-option" data-color="#006400">Dark Green</div>
+          <div class="color-option" data-color="#008080">Teal</div>
+          <div class="color-option" data-color="#800080">Purple</div>
+        </div>
+      </div>
+
+      <div class="customization-section">
+        <h3>Snake Pattern</h3>
+        <div class="pattern-options">
+          <div class="pattern-option" data-pattern="scales">Scales</div>
+          <div class="pattern-option" data-pattern="smooth">Smooth</div>
+          <div class="pattern-option" data-pattern="striped">Striped</div>
+        </div>
+      </div>
+
+      <div class="customization-section">
+        <h3>Eye Color</h3>
+        <div class="color-palette eye-colors">
+          <div class="color-option" data-color="white">White</div>
+          <div class="color-option" data-color="blue">Blue</div>
+          <div class="color-option" data-color="green">Green</div>
+          <div class="color-option" data-color="red">Red</div>
+        </div>
+      </div>
+
+      <div class="preview-section">
+        <h3>Preview</h3>
+        <canvas id="snakePreviewCanvas"></canvas>
+      </div>
+
+      <div class="customization-actions">
+        <button id="saveCustomizationBtn" class="menu-button">Save Customization</button>
+        <button class="modal-close menu-button">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="storeModal" class="modal">
+    <div class="modal-content store-content">
+      <h2>Snake Quest Store</h2>
+      <div id="storeContent" class="store-items">
+        <!-- Store items will be dynamically populated -->
+      </div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+  <div id="gameContainer" class="container" style="display: none;">
+    <h1 class="title">Snake Quest</h1>
+    <div id="gameInfo" class="game-info"></div>
+    <div class="settings-icon" id="settingsIcon">
+      <svg viewBox="0 0 24 24" width="24" height="24">
+        <path fill="currentColor" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.04,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+      </svg>
+    </div>
+    <div class="game-border">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+    <div class="controls">
+      <button id="startBtn">Begin Quest</button>
+      <button id="resetBtn">New Quest</button>
+      <button id="menuBtn">Main Menu</button>
+      <div class="score">
+        <div class="score-value"><span id="scoreValue">0</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="modal">
+    <div class="modal-content">
+      <h2>About Snake Quest</h2>
+      <p>Welcome to Snake Quest, where an intelligent serpent embarks on an epic journey to collect magical gold pieces! This unique take on the classic snake game features an AI-controlled snake that navigates through the mystical realm.</p>
+      <p>Watch as the snake uses its ancient wisdom to collect treasures and grow in length. Can it achieve the highest score in the realm?</p>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+  <div id="settingsModal" class="modal">
+    <div class="modal-content settings-content">
+      <h2>Settings</h2>
+      <div class="settings-section">
+        <div class="setting-item">
+          <label class="switch">
+            <input type="checkbox" id="aiToggle" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="setting-label">AI Control</span>
+        </div>
+        <div class="setting-item">
+          <label class="switch">
+            <input type="checkbox" id="musicToggle" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="setting-label">Background Music</span>
+        </div>
+        <div class="setting-item">
+          <label class="switch">
+            <input type="checkbox" id="sfxToggle" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="setting-label">Sound Effects</span>
+        </div>
+        <div class="controls-info">
+          <h3>Controls:</h3>
+          <div class="desktop-controls-info">
+            <div class="key-bindings">
+              <div class="key-bind">
+                <span class="key">↑</span>
+                <span class="action">Move Up</span>
+              </div>
+              <div class="key-bind">
+                <span class="key">↓</span>
+                <span class="action">Move Down</span>
+              </div>
+              <div class="key-bind">
+                <span class="key">←</span>
+                <span class="action">Move Left</span>
+              </div>
+              <div class="key-bind">
+                <span class="key">→</span>
+                <span class="action">Move Right</span>
+              </div>
+            </div>
+          </div>
+          <div class="touch-controls-info">
+            <p>Swipe in any direction to control the snake:</p>
+            <div class="key-bindings">
+              <div class="key-bind">
+                <span class="action">Swipe Up: Move Up</span>
+              </div>
+              <div class="key-bind">
+                <span class="action">Swipe Down: Move Down</span>
+              </div>
+              <div class="key-bind">
+                <span class="action">Swipe Left: Move Left</span>
+              </div>
+              <div class="key-bind">
+                <span class="action">Swipe Right: Move Right</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+  <div id="gameOverModal" class="modal">
+    <div class="modal-content game-over-content">
+      <h2>Game Over</h2>
+      <div class="game-over-reason" id="gameOverReason"></div>
+      <div class="game-stats">
+        <div class="stat-item">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="finalScore">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Length</div>
+          <div class="stat-value" id="finalLength">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label"></div>
+          <div class="stat-value" id="finalFood">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Time</div>
+          <div class="stat-value" id="finalTime">0:00</div>
+        </div>
+      </div>
+      <div class="high-score">
+        High Score: <span id="highScore">0</span>
+      </div>
+      <div class="game-over-buttons">
+        <button class="menu-button" data-action="try-again">Try Again</button>
+        <button class="menu-button" data-action="view-stats">View Stats</button>
+        <button class="menu-button" data-action="main-menu">Main Menu</button>
+      </div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+  <div id="statsModal" class="modal">
+    <div class="modal-content">
+      <h2>Statistics</h2>
+      <div id="statsContent"></div>
+      <button class="modal-close">Close</button>
+    </div>
+  </div>
+
+  <!-- Audio element for background music -->
+  <audio id="backgroundMusic" loop>
+    <source src="jungle.mp3" type="audio/mpeg">
+  </audio>
+</body>
+</html>
